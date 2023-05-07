@@ -10,17 +10,25 @@ interface Props {
 
 export function Products ({ products }: Props) {
   const [item, setItem] = useState(9)
-  const [showMore, setShowMore] = useState(false)
+  const [Cart, setShowCart] = useState({
+    showMore: true,
+    showLess: false
+  })
   const lazyLoad = useRef<HTMLDivElement>(null)
   const entry = useIntersectionObserver(lazyLoad, {})
   const isVisible = !!((entry?.isIntersecting) ?? false)
 
-  const handleShowMore = () => {
-    setShowMore(!showMore)
-    setItem(item + 3)
+  const handleShowMore = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (e.target.innerHTML === 'ShowMore') {
+      setShowCart({ showMore: false, showLess: true })
+      setItem(item + 3); return
+    }
+    setShowCart({ showMore: true, showLess: true })
+    setItem(9)
   }
+
   useEffect(() => {
-    if (!showMore) return
+    if (Cart.showMore) return
     isVisible && setItem(item + 3)
   }, [isVisible])
 
@@ -59,7 +67,11 @@ export function Products ({ products }: Props) {
                 })
                 }
             </ul>
-            {!showMore && <button onClick={handleShowMore} style={{ color: '#fff' }}>ShowMore</button>}
+            {
+            Cart.showMore
+              ? <button onClick={handleShowMore} style={{ color: '#fff' }}>ShowMore</button>
+              : <button onClick={handleShowMore} style={{ color: '#fff' }}>ShowLess</button>
+            }
             <div id='lazy' ref={lazyLoad}></div>
         </main>
   )
