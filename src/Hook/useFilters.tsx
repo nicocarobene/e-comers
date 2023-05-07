@@ -12,7 +12,7 @@ export default function useFilters () {
       return (
         product.price >= filters.minPrice && (
           filters.category === FilterBy.ALL ||
-              product.category === filters.category
+          product.category === filters.category
         )
       )
     })

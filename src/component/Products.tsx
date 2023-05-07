@@ -1,21 +1,38 @@
+import { useRef, useState, useEffect } from 'react'
 import { type Product } from '../../types'
 import useCart from '../Hook/useCart'
 import { AddToCartIcon, RemoveFromCartIcon } from './icons'
 import './Product.css'
+import { useIntersectionObserver } from 'usehooks-ts'
 interface Props {
   products: Product[]
 }
 
 export function Products ({ products }: Props) {
+  const [item, setItem] = useState(9)
+  const [showMore, setShowMore] = useState(false)
+  const lazyLoad = useRef<HTMLDivElement>(null)
+  const entry = useIntersectionObserver(lazyLoad, {})
+  const isVisible = !!((entry?.isIntersecting) ?? false)
+
+  const handleShowMore = () => {
+    setShowMore(!showMore)
+    setItem(item + 3)
+  }
+  useEffect(() => {
+    if (!showMore) return
+    isVisible && setItem(item + 3)
+  }, [isVisible])
+
   const { addToCart, removeFromCart, cart } = useCart()
   const checkProductInCart = (product: Product) => {
     return cart.some(item => item.id === product.id)
   }
 
   return (
-        <main className='products'>
+        <main className='products' style={{ display: 'flex', flexDirection: 'column' }}>
             <ul>
-                {products.slice(0, 10).map((product: Product) => {
+                {products.slice(0, item).map((product: Product) => {
                   const isproductInCart = checkProductInCart(product)
                   return (
                         <li key={product.id}>
@@ -42,6 +59,8 @@ export function Products ({ products }: Props) {
                 })
                 }
             </ul>
+            {!showMore && <button onClick={handleShowMore} style={{ color: '#fff' }}>ShowMore</button>}
+            <div id='lazy' ref={lazyLoad}></div>
         </main>
   )
 }
