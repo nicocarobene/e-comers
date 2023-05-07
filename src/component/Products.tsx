@@ -19,7 +19,8 @@ export function Products ({ products }: Props) {
   const isVisible = !!((entry?.isIntersecting) ?? false)
 
   const handleShowMore = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (e.target.innerHTML === 'ShowMore') {
+    const value = e.target as HTMLElement
+    if (value.innerHTML === 'ShowMore') {
       setShowCart({ showMore: false, showLess: true })
       setItem(item + 3); return
     }
